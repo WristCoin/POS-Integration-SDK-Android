@@ -22,8 +22,11 @@ task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
     from androidJavadocs.destinationDir
 }
 
+task emptyJar(type: Jar) {
+    archiveAppendix.set("empty")
+}
+
 artifacts {
-    archives androidJavadocsJar
     archives androidSourcesJar
 }
 
@@ -68,7 +71,6 @@ afterEvaluate {
                 artifactId publishArtifactId
                 version publishVersion
 
-                artifact androidJavadocsJar
                 artifact androidSourcesJar
 
                 // POM metadata
