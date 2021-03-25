@@ -20,3 +20,11 @@ dependencies {
 repositories {
     mavenCentral()
 }
+
+ext {
+    publishGroupId = globalCfg.publishGroupId
+    publishArtifactId = 'commandfamily-wristcoinpos'
+    publishVersion = globalCfg.publishVersion
+}
+
+apply from: scripts.publishMavenCentralScript
