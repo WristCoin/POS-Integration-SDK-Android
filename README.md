@@ -1,13 +1,14 @@
 # WristCoinPOS Integration SDK for Android
+
 [![Version](https://img.shields.io/maven-central/v/com.mywristcoin/commandfamily-wristcoinpos)](https://mvnrepository.com/artifact/com.mywristcoin)
-[![Kotlin](https://img.shields.io/badge/kotlin-1.4.32-blue.svg?logo=kotlin)](http://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/kotlin-1.4.31-blue.svg?logo=kotlin)](http://kotlinlang.org)
 [![License](https://img.shields.io/github/license/WristCoin/POS-Integration-SDK-Android)](https://github.com/WristCoin/POS-Integration-SDK-Android/blob/master/LICENSE)
 
 ## Introduction
 
 This project is an SDK to allow POS vendors to integrate WristCoin contactless cashless payments and accept WristCoin wallets as a form of payment.
 
-A prerequisite to using this SDK is having the WristCoin external terminal that accepts NFC payments using WristCoin wristbands/cards/fobs.  The terminal abstracts all of the NFC details away from your POS application.  There exist both Bluetooth and USB Terminals.  Communcation methods can be interchanged freely with no change in end-user library usage.  Detailed specifications about the Bluetooth connection handling, communication protocol, and requirements are outside the scope of this SDK.
+A prerequisite to using this SDK is having the WristCoin external terminal that accepts NFC payments using WristCoin wristbands/cards/fobs.  The terminal abstracts all of the NFC details away from your POS application.  Terminals exist in both Bluetooth and USB modes.  Communcation modes can be interchanged freely with no change in end-user library usage.  Detailed specifications about the Bluetooth connection handling, communication protocol, and requirements are outside the scope of this SDK.
 
 The [Android TCMP Tappy SDK](https://github.com/TapTrack/TCMPTappy-Android) is required in order to connect and communicate with the terminal.  This library is not included in this project.  Please refer to the TCMP Tappy SDK project page for details regarding required dependencies for Bluetooth and USB communication, and information on how to perform common operations such as scanning for terminals, connecting, sending commands, and receiving responses.
 
@@ -26,7 +27,7 @@ The SDK currently supports the following operations:
 
 After each command has been created, to send it to the terminal (assuming the the terminal is connected):
 
-```kotlin
+``` kotlin
 yourWristCoinTerminal.sendMessage(setEventIdCommand)
 ```
 
@@ -36,7 +37,7 @@ Where `yourWristCoinTerminal` is of type `Tappy` (provided by the TCMP Tappy SDK
 
 Once connected to a WristCoin NFC terminal, you must set a response listener to handle data being received from the terminal:
 
-```kotlin
+``` kotlin
 yourWristCoinTerminal.registerResponseListener { message: TCMPMessage ->
     // Handle message here
 }
@@ -50,16 +51,18 @@ Alternatively, you can pass an object implementing the `Tappy.ResponseListener` 
 
 At the moment, WristCoin terminals are pre-configured at the factory for the event(s) you specify when ordering the terminals.  Setting the event id selects the event your POS is using.  Passing apodn event id that the terminal was not configured for at the factory will result in an error response from the WristCoin terminal.  Future versions of the POS integration program will allow on-the-fly configuration of terminals for various events but at the moment the factory configuration will have to match the event id you're working with.
 
-Whether your `eventId` is a `UUID` or an equivalent 16-byte `ByteArray`, construct a `SetEventIdCommand` like so:
+Whether your `eventId` is a `UUID` or an equivalent 16-byte `ByteArray` , construct a `SetEventIdCommand` like so:
 
-```kotlin
+``` kotlin
 val eventId = ...
 val command = SetEventIdCommand(eventId)
 ```
 
 The `SetEventIdCommand` constructor can handle both types.
 
-Then send the command to the terminal as shown above.  It is recommended that you handle exceptions that may be thrown.  The examples provided are intended for explanatory purposes only and hence are shortened for brevity.  In practice, you will want to handle these exceptions.
+Then send the command to the terminal as shown above. 
+
+It is recommended that you handle exceptions that may be thrown in the constructor if passing a `ByteArray` .  If a constructor can throw exceptions, it is annotated as such, and possible exceptions that can be thrown are explicitly listed.  The examples provided are intended for explanatory purposes only and hence are shortened for brevity.  In practice, you will want to handle these exceptions.
 
 ### Debiting Wristband Credit - Short Response
 
@@ -67,15 +70,16 @@ The short response version of this command is intended to allow a quick and easy
 
 To request to debit one dollar (or pesos, euros, pounds, etc..):
 
-```kotlin
+``` kotlin
 val command = DebitWristbandShortRespCommand(debitAmountCentavos = 100)
 ```
 
 This will use the terminal's default timeout of about eight seconds.  To specify your own timeout, e.g. 12 seconds:
 
-```kotlin
+``` kotlin
 val command = DebitWristbandShortRespCommand(debitAmountCentavos = 100, timeout = 12)
 ```
+
  
  Note: Specifying a timeout is interpreted as seconds from 0-255 seconds, where 0 indicates no timeout (i.e.  poll for a wristband until interrupted).
  
@@ -87,15 +91,16 @@ For integrations that require the full resulting wristband status after a debit 
 
 To request to debit one dollar (or pesos, euros, pounds, etc..):
 
-```kotlin
+``` kotlin
 val command = DebitWristbandFullRespCommand(debitAmountCentavos = 100)
 ```
 
 This will use the terminal's default timeout of about eight seconds.  To specify your own timeout, e.g. 12 seconds:
 
-```kotlin
+``` kotlin
 val command = DebitWristbandFullRespCommand(debitAmountCentavos = 100, timeout = 12)
 ```
+
  
  Note: Specifying a timeout is interpreted as seconds from 0-255 seconds, where 0 indicates no timeout (i.e.  poll for a wristband until interrupted).
  
@@ -103,12 +108,10 @@ val command = DebitWristbandFullRespCommand(debitAmountCentavos = 100, timeout =
 
 ### Getting Terminal Firmware Version
 
-Requires the [TCMP Tappy System Command Family](https://github.com/TapTrack/System-Command-Family).
-
 This command is handy to know what version of terminal firmware you have - especially useful as the beta program continues as new features are added:
 
-```kotlin
-val command = GetFirmwareVersionCommand()
+``` kotlin
+val command = GetWristCoinPOSCommandFamilyVersionCommand()
 ```
 
 Then send the command to the terminal as shown above.
@@ -128,7 +131,7 @@ This SDK depends on the `TCMP Tappy SDK` for NFC reader communication.
 
 WristCoinPOS is available on Maven Central.  To install it, ensure you have `mavenCentral()` listed as a repository in your build.gradle file:
 
-```groovy
+``` groovy
 repositories {
     ...
     mavenCentral()
@@ -138,7 +141,7 @@ repositories {
 
 Then, simply add the following line to your dependencies:
 
-```groovy
+``` groovy
 dependencies {
     ...
     implementation 'com.mywristcoin:commandfamily-wristcoinpos:0.1.0'
