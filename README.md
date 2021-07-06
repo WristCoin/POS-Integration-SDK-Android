@@ -79,7 +79,6 @@ This will use the terminal's default timeout of about eight seconds.  To specify
 ``` kotlin
 val command = DebitWristbandShortRespCommand(debitAmountCentavos = 100, timeout = 12)
 ```
-
  
  Note: Specifying a timeout is interpreted as seconds from 0-255 seconds, where 0 indicates no timeout (i.e.  poll for a wristband until interrupted).
  
@@ -87,7 +86,7 @@ val command = DebitWristbandShortRespCommand(debitAmountCentavos = 100, timeout 
 
 ### Debiting Wristband Credit - Full Response
 
-For integrations that require the full resulting wristband status after a debit transaction, the full response version of the debit command is used.  This returns the complete resulting wristband status as a TLV array which would then require validation and parsing (note: future releases of the SDK will have a TLV library provided for this purpose).
+For integrations that require the full resulting wristband status after a debit transaction, the full response version of the debit command is used. This returns the complete resulting wristband status as a TLV array which is parsed into a ```AppWristbandState``` object called ```resultingWristbandState```.
 
 To request to debit one dollar (or pesos, euros, pounds, etc..):
 
@@ -115,6 +114,47 @@ val command = GetWristCoinPOSCommandFamilyVersionCommand()
 ```
 
 Then send the command to the terminal as shown above.
+
+## AppWristbandState
+
+The ```AppWristbandState``` class makes it easy to store the wristband data.
+
+To access the lazy init variables (balance, refundableOfflineBalance, rewardBalance, isClosedOut, isDeactivated, isConfiguredForOnlineOperation):
+
+Create an instance of an ```AppWristbandState``` object
+```kotlin
+val wristbandState = AppWristbandState(
+        uid = byteArrayOf(0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00),
+        majorVersion = 0x01,
+        minorVersion = 0x05,
+        offlineCreditTotal = 0x00,
+        creditTxCount = 0x00,
+        debitTotal = 0x00,
+        debitTxCount = 0x00,
+        reversalTotal =0x00 ,
+        reversalApprovedCount = 0x00,
+        reversalDeniedCount = 0x00,
+        reversalDecisionCount = 0x00,
+        reversalRequestCount = 0x00,
+        closeoutCount = 0x00,
+        aeonCount = 0x00,
+        deactivatedCount = 0x00,
+        didReadReversals = 0x00,
+        onlineCreditTotal = 0x00,
+        scratchState = AppScratchState.OfflineScratched ,
+        topupConfigurationSupport = AppTopupConfigurationSupport.OfflineOnly,
+        rewardPointCreditTotal = 0x00,
+        rewardPointCreditTxCount = 0x00,
+        rewardPointDebitTotal = 0x00,
+        rewardPointDebitTxCount = 0x00,
+        preloadedCreditTotal = 0x00,
+        preloadedPointsTotal = 0x00,
+)
+```
+To access the balance:
+```kotlin
+val balance = wristbandState.balance
+```
 
 ## Tag - Length - Value (TLV) Data Encoding Specification
 

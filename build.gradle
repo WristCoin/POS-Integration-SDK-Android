@@ -36,6 +36,7 @@ ext.globalCfg = [
 ext.libraries = [
         androidSupportAnnotations: "com.android.support:support-annotations:23.1.1",
         tcmpCommandFamilyCommon: "com.taptrack.tcmptappy2:tcmp:2.0.0",
+        kotlinTlv: 'com.taptrack:kotlin-tlv:2.0.0',
         junit: 'junit:junit:4.12',
 ]
 
