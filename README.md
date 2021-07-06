@@ -87,7 +87,7 @@ val command = DebitWristbandShortRespCommand(debitAmountCentavos = 100, timeout 
 
 ### Debiting Wristband Credit - Full Response
 
-For integrations that require the full resulting wristband status after a debit transaction, the full response version of the debit command is used.  This returns the complete resulting wristband status as a TLV array which would then require validation and parsing (note: future releases of the SDK will have a TLV library provided for this purpose).
+For integrations that require the full resulting wristband status after a debit transaction, the full response version of the debit command is used.  This returns the complete resulting wristband status as a TLV array which is parsed into a ```AppCardState``` object that represents the resulting card state.
 
 To request to debit one dollar (or pesos, euros, pounds, etc..):
 
