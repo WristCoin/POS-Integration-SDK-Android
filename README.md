@@ -119,53 +119,44 @@ Then send the command to the terminal as shown above.
 
 The ```AppWristbandState``` class makes it easy to store the wristband data.
 
-To access the lazy init variables (balance, refundableOfflineBalance, rewardBalance, isClosedOut, isDeactivated, isConfiguredForOnlineOperation):
+To access the lazy init variables (`balance`, `refundableOfflineBalance`, `rewardBalance`, `isClosedOut`, `isDeactivated`, `isConfiguredForOnlineOperation`):
 
-Create an instance of an ```AppWristbandState``` object
+When an instance of ```AppWristbandState``` is returned in the parsed ```DebitWristbandFullRespResponse()```:
+
 ```kotlin
-val wristbandState = AppWristbandState(
-        uid = byteArrayOf(0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00),
-        majorVersion = 0x01,
-        minorVersion = 0x05,
-        offlineCreditTotal = 0x00,
-        creditTxCount = 0x00,
-        debitTotal = 0x00,
-        debitTxCount = 0x00,
-        reversalTotal =0x00 ,
-        reversalApprovedCount = 0x00,
-        reversalDeniedCount = 0x00,
-        reversalDecisionCount = 0x00,
-        reversalRequestCount = 0x00,
-        closeoutCount = 0x00,
-        aeonCount = 0x00,
-        deactivatedCount = 0x00,
-        didReadReversals = 0x00,
-        onlineCreditTotal = 0x00,
-        scratchState = AppScratchState.OfflineScratched ,
-        topupConfigurationSupport = AppTopupConfigurationSupport.OfflineOnly,
-        rewardPointCreditTotal = 0x00,
-        rewardPointCreditTxCount = 0x00,
-        rewardPointDebitTotal = 0x00,
-        rewardPointDebitTxCount = 0x00,
-        preloadedCreditTotal = 0x00,
-        preloadedPointsTotal = 0x00,
-)
+// DebitWristbandFullRespResponse received from the WristCoin NFC terminal
+val resultingWristbandState = response.getResultingWristbandState()
 ```
-To access the balance:
+For ```GetWristbandStatusResponse```:
 ```kotlin
-val balance = wristbandState.balance
+// GetWristbandStatusResponse received from the WristCoin NFC terminal
+val wristbandState = response.getWristbandState()
+```
+To access the ```AppWristbandState``` members:
+```kotlin
+val uid = resultingWristbandState.uid // get the UID of the wristband
+```
+or for ```GetWristbandStatusResponse```:
+```kotlin
+val uid = wristbandState.uid // get the UID of the wristband
+```
+
+To read the values computed in the ```AppWristbandState``` class:
+```kotlin
+val resultingBalance = resultingWristbandState.balance // resulting balance from DebitWristbandFullRespResponse
+val balance = wristbandState.balance // balance from GetWristbandStatusResponse
 ```
 
 ## Tag - Length - Value (TLV) Data Encoding Specification
 
-Coming soon: When returning wristband account/status information, the terminals use a TLV specification to encode the data.  Star this repo to watch for updates as more documentation is released in the coming weeks.
+In v1.1.0 TLV parsing is now supported and is handled by the `KotlinTLV` dependency 
 
 ## Requirements
 
 * Minimum Android version for deployment is Android KitKat (4.4)
 * Kotlin 1.4.32
 
-This SDK depends on the `TCMP Tappy SDK` for NFC reader communication.
+This SDK depends on the `TCMP Tappy SDK` for NFC reader communication and `KotlinTLV` version `2.0.0` minimum.
 
 ## Installation
 
@@ -184,7 +175,7 @@ Then, simply add the following line to your dependencies:
 ``` groovy
 dependencies {
     ...
-    implementation 'com.mywristcoin:commandfamily-wristcoinpos:0.1.0'
+    implementation 'com.mywristcoin:commandfamily-wristcoinpos:1.1.0'
     ...
 }
 ```
