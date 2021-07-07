@@ -15,7 +15,7 @@ sealed class AppTopupConfigurationSupport {
     object DualMode : AppTopupConfigurationSupport()
 }
 
-data class AppWristbandState(
+data class AppWristbandState internal constructor(
     val uid: ByteArray,
     val majorVersion: Int,
     val minorVersion: Int,

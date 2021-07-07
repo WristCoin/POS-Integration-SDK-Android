@@ -190,7 +190,6 @@ class WristCoinPOSTest {
         assertEquals(response.getResultingWristbandState().rewardPointDebitTxCount, byteArrayOf(0x00, 0x00, 0x00, 0x00).toInt())
         assertEquals(response.getResultingWristbandState().preloadedCreditTotal, byteArrayOf(0x00, 0x00, 0x00, 0x00).toInt())
         assertEquals(response.getResultingWristbandState().preloadedPointsTotal, byteArrayOf(0x00, 0x00, 0x00, 0x00).toInt())
-        assertEquals(response.getResultingWristbandState().rewardBalance, 0)
     }
     @Test
     fun getWristbandStatusResponse_logical_fields_nonzero_values(){
