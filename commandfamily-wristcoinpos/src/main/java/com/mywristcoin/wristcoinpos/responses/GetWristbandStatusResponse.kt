@@ -47,7 +47,7 @@ class GetWristbandStatusResponse : AbstractWristCoinPOSMessage {
                 uid = lookUpTlvInList(tlvs, type_card_tag_code).value,
                 majorVersion = lookUpTlvInList(tlvs, type_card_version).value[0].toInt(),
                 minorVersion = lookUpTlvInList(tlvs, type_card_version).value[1].toInt(),
-                offlineCreditTotal = lookUpTlvInList(tlvs, type_offline_topup_amount).value.toInt(),
+                offlineCreditTotal = lookUpTlvInListIfPresent(tlvs, type_offline_topup_amount)?.value?.toInt(),
                 creditTxCount = lookUpTlvInList(tlvs, type_card_credit_tx_count).value.toInt(),
                 debitTotal = lookUpTlvInList(tlvs, type_card_debit_total).value.toInt(),
                 debitTxCount = lookUpTlvInList(tlvs, type_card_debit_tx_count).value.toInt(),
@@ -59,8 +59,6 @@ class GetWristbandStatusResponse : AbstractWristCoinPOSMessage {
                 closeoutCount = lookUpTlvInList(tlvs, type_card_closeout_count).value.toInt(),
                 aeonCount = lookUpTlvInList(tlvs, type_card_aeon_count).value.toInt(),
                 deactivatedCount = lookUpTlvInList(tlvs, type_deactivate_count).value.toInt(),
-                didReadReversals = lookUpTlvInList(tlvs, type_card_did_read_reversals).value[0] != 0x00.toByte(),
-                onlineCreditTotal = lookUpTlvInList(tlvs, type_online_topup_amount).value.toInt(),
                 scratchState = when (lookUpTlvInList(tlvs, type_scratch_status).value[0]) {
                     0x00.toByte() -> AppScratchState.NotScratchable
                     0x01.toByte() -> AppScratchState.Unscratched
@@ -74,12 +72,14 @@ class GetWristbandStatusResponse : AbstractWristCoinPOSMessage {
                     0x02.toByte() -> AppTopupConfigurationSupport.DualMode
                     else -> throw InvalidTopupConfigurationException()
                 },
+                preloadedCreditTotal = lookUpTlvInList(tlvs, type_preloaded_credit_amount).value.toInt(),
+                didReadReversals = false,
+                onlineCreditTotal = lookUpTlvInListIfPresent(tlvs, type_online_topup_amount)?.value?.toInt(),
                 rewardPointCreditTotal = lookUpTlvInList(tlvs, type_reward_credit_total).value.toInt(),
                 rewardPointCreditTxCount = lookUpTlvInList(tlvs, type_reward_credit_tx_count).value.toInt(),
                 rewardPointDebitTotal = lookUpTlvInList(tlvs, type_reward_debit_total).value.toInt(),
                 rewardPointDebitTxCount = lookUpTlvInList(tlvs, type_reward_debit_tx_count).value.toInt(),
-                preloadedCreditTotal = lookUpTlvInList(tlvs, type_preloaded_credit_amount).value.toInt(),
-                preloadedPointsTotal = lookUpTlvInListIfPresent(tlvs, type_preloaded_points_amount)?.value?.toInt()
+                preloadedPointsTotal = lookUpTlvInListIfPresent(tlvs, type_preloaded_points_amount)?.value?.toInt(),
             )
         } catch (e: TLV.TLVNotFoundException) {
             throw MissingWristbandStateFieldException()

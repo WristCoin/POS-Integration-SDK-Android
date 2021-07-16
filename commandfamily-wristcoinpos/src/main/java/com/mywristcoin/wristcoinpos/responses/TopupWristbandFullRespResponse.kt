@@ -1,27 +1,16 @@
 package com.mywristcoin.wristcoinpos.responses
 
 import com.mywristcoin.wristcoinpos.*
-import com.mywristcoin.wristcoinpos.type_card_aeon_count
-import com.mywristcoin.wristcoinpos.type_card_closeout_count
-import com.mywristcoin.wristcoinpos.type_card_debit_total
-import com.mywristcoin.wristcoinpos.type_card_reversal_decision_count
-import com.mywristcoin.wristcoinpos.type_card_reversal_total
-import com.mywristcoin.wristcoinpos.type_card_tag_code
-import com.mywristcoin.wristcoinpos.type_card_version
-import com.mywristcoin.wristcoinpos.type_online_topup_amount
-import com.mywristcoin.wristcoinpos.type_preloaded_credit_amount
 import com.mywristcoin.wristcoinpos.type_preloaded_points_amount
-import com.mywristcoin.wristcoinpos.type_reversal_request_count
-import com.mywristcoin.wristcoinpos.type_reward_credit_total
-import com.mywristcoin.wristcoinpos.type_reward_debit_total
-import com.taptrack.kotlin_tlv.*
+import com.taptrack.kotlin_tlv.TLV
+import com.taptrack.kotlin_tlv.lookUpTlvInList
+import com.taptrack.kotlin_tlv.lookUpTlvInListIfPresent
+import com.taptrack.kotlin_tlv.parseTlvData
 import com.taptrack.tcmptappy2.TCMPMessageParseException
-import java.lang.UnsupportedOperationException
 
-class DebitWristbandFullRespResponse : AbstractWristCoinPOSMessage {
-
+class TopupWristbandFullRespResponse : AbstractWristCoinPOSMessage{
     companion object {
-        const val COMMAND_CODE: Byte = 0x04
+        const val COMMAND_CODE: Byte = 0x06
     }
 
     private lateinit var resultingWristbandState: AppWristbandState
@@ -43,7 +32,8 @@ class DebitWristbandFullRespResponse : AbstractWristCoinPOSMessage {
         parsePayload(payload)
     }
 
-    @Throws(TCMPMessageParseException::class, MissingWristbandStateFieldException::class,
+    @Throws(
+        TCMPMessageParseException::class, MissingWristbandStateFieldException::class,
         TLV.MalformedTlvByteArrayException::class, InvalidScratchStatusException::class, InvalidTopupConfigurationException::class)
     override fun parsePayload(payload: ByteArray) {
         if (payload.size < 3) {
@@ -99,5 +89,4 @@ class DebitWristbandFullRespResponse : AbstractWristCoinPOSMessage {
     override fun getPayload(): ByteArray = wristbandStatusTlv
 
     override fun getCommandCode(): Byte = COMMAND_CODE
-
 }

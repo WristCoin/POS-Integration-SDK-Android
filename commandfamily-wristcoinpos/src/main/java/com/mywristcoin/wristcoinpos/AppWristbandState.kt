@@ -19,7 +19,7 @@ data class AppWristbandState internal constructor(
     val uid: ByteArray,
     val majorVersion: Int,
     val minorVersion: Int,
-    val offlineCreditTotal: Int,
+    val offlineCreditTotal: Int?,
     val creditTxCount: Int,
     val debitTotal: Int,
     val debitTxCount: Int,
@@ -32,7 +32,7 @@ data class AppWristbandState internal constructor(
     val aeonCount: Int,
     val deactivatedCount: Int,
     val didReadReversals: Boolean,
-    val onlineCreditTotal: Int,
+    val onlineCreditTotal: Int?,
     val scratchState: AppScratchState,
     val topupConfigurationSupport: AppTopupConfigurationSupport,
 
@@ -44,25 +44,25 @@ data class AppWristbandState internal constructor(
     val preloadedPointsTotal: Int?
 ) {
     val balance: Int by lazy {
-        (offlineCreditTotal + onlineCreditTotal + preloadedCreditTotal) + reversalTotal - debitTotal
+        ((offlineCreditTotal ?: 0) + (onlineCreditTotal ?: 0) + preloadedCreditTotal) + reversalTotal - debitTotal
     }
 
 
     val refundableOfflineBalance: Int by lazy {
 
         if (preloadedCreditTotal == 0) {
-            offlineCreditTotal + reversalTotal - debitTotal
+            (offlineCreditTotal ?: 0) + reversalTotal - debitTotal
         } else {
-            if (debitTotal == 0 && offlineCreditTotal == 0) {
+            if (debitTotal == 0 && (offlineCreditTotal ?: 0) == 0) {
                 0
-            } else if (offlineCreditTotal != 0 && debitTotal > preloadedCreditTotal) {
-                if (offlineCreditTotal - debitTotal + preloadedCreditTotal >= 0) {
-                    offlineCreditTotal - debitTotal + preloadedCreditTotal
+            } else if ((offlineCreditTotal ?: 0) != 0 && debitTotal > preloadedCreditTotal) {
+                if ((offlineCreditTotal ?: 0) - debitTotal + preloadedCreditTotal >= 0) {
+                    (offlineCreditTotal ?: 0) - debitTotal + preloadedCreditTotal
                 } else {
                     0
                 }
-            } else if (offlineCreditTotal != 0 && debitTotal <= preloadedCreditTotal) {
-                offlineCreditTotal
+            } else if ((offlineCreditTotal ?: 0) != 0 && debitTotal <= preloadedCreditTotal) {
+                (offlineCreditTotal ?: 0)
             } else {
                 0
             }
@@ -133,7 +133,7 @@ data class AppWristbandState internal constructor(
         var result = uid.contentHashCode()
         result = 31 * result + majorVersion
         result = 31 * result + minorVersion
-        result = 31 * result + offlineCreditTotal
+        result = 31 * result + (offlineCreditTotal ?: 0)
         result = 31 * result + creditTxCount
         result = 31 * result + debitTotal
         result = 31 * result + debitTxCount
@@ -146,7 +146,7 @@ data class AppWristbandState internal constructor(
         result = 31 * result + aeonCount
         result = 31 * result + deactivatedCount
         result = 31 * result + didReadReversals.hashCode()
-        result = 31 * result + onlineCreditTotal
+        result = 31 * result + (onlineCreditTotal ?: 0)
         result = 31 * result + scratchState.hashCode()
         result = 31 * result + topupConfigurationSupport.hashCode()
         result = 31 * result + rewardPointCreditTotal

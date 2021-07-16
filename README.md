@@ -21,6 +21,8 @@ The SDK currently supports the following operations:
 * Event selection
 * Reading wristband status and balance information
 * Debiting the wristband a specified amount
+* Topping up the wristband a specified amount
+* Closing out wristbands
 * Getting the terminal's firmware version
 
 ### Sending commands to the WristCoin NFC terminal
@@ -93,17 +95,33 @@ To request to debit one dollar (or pesos, euros, pounds, etc..):
 ``` kotlin
 val command = DebitWristbandFullRespCommand(debitAmountCentavos = 100)
 ```
+### Topping Up Wristband Credit - Short Response
+Just like the short response for debiting the wristband, this command returns the available balance on the wristband after a topup.
+To request to topup one dollar (or pesos, euros, pounds, etc..):
+
+``` kotlin
+val command = TopupWristbandShortRespCommand(topupAmountCentavos = 100)
+```
 
 This will use the terminal's default timeout of about eight seconds.  To specify your own timeout, e.g. 12 seconds:
 
 ``` kotlin
-val command = DebitWristbandFullRespCommand(debitAmountCentavos = 100, timeout = 12)
+val command = TopupWristbandShortRespCommand(topupAmountCentavos = 100, timeout = 12)
 ```
-
  
  Note: Specifying a timeout is interpreted as seconds from 0-255 seconds, where 0 indicates no timeout (i.e.  poll for a wristband until interrupted).
  
  Then send the command to the terminal as shown above.
+ 
+### Topping Up Wristband Credit - Full Response
+
+For integrations that require the full resulting wristband status after a topup transaction, the full response version of the topup command is used. This returns the complete resulting wristband status as a TLV array which is parsed into a ```AppWristbandState``` object called ```resultingWristbandState```.
+
+To request to topup one dollar (or pesos, euros, pounds, etc..):
+
+``` kotlin
+val command = TopupWristbandFullRespCommand(topupAmountCentavos = 100)
+```
 
 ### Getting Terminal Firmware Version
 
@@ -115,6 +133,18 @@ val command = GetWristCoinPOSCommandFamilyVersionCommand()
 
 Then send the command to the terminal as shown above.
 
+### Closeout Wristband
+
+When no more transactions need to be done the closeout command can be used, once closed out the wristband can no long be topped up or debited. Upon a successful closeout the full wristband status is returned as a TLV array which is parsed into an ```AppWristbandState``` objected called ```wristbandState```
+
+```kotlin
+val command = CloseoutWristbandCommand()
+```
+This will use the terminal's default timeout of about eight seconds.  To specify your own timeout, e.g. 12 seconds:
+
+```kotlin
+val command = CloseoutWristbandCommand(timeout = 12)
+```
 ## AppWristbandState
 
 The ```AppWristbandState``` class makes it easy to store the wristband data.
@@ -147,6 +177,42 @@ val resultingBalance = resultingWristbandState.balance // resulting balance from
 val balance = wristbandState.balance // balance from GetWristbandStatusResponse
 ```
 
+## Error Codes
+Potential errors (response code 0x7F) that the user can run into are the following:
+
+| Description  | Error Code  | Comments |
+| :------------ |:---------------:| :-----|
+| Invalid parameter | 0x01 | Invalid parameter |
+| Polling error | 0x02 | Polling error when detecting NFC tag |
+| Too few parameters | 0x03 | Too few parameters |
+| Too many parameters | 0x04 | Too many parameters |
+| Invalid command code | 0x05 | Unsupported command code |
+| Event ID not set | 0x06 | Must set event ID before you can do that |
+| WristCoin wallet not found | 0x07 | WristCoin wallet not found on the NFC tag |
+| Unable to read WristCoin wallet not found on the NFC tag | 0x08 | unable to read WristCoin wallet |
+| Invalid WristCoin wallet data | 0x09 | Invalid WristCoin wallet data |
+| Wrong event | 0x0A | Wrong event ID - wristband is for a different event |
+| Unsupported wristband version | 0x0B | Unsupported wristband version, only versions 1.5 and later are supported |
+| Event ID not supported | 0x0C | Event ID specified is not supported by this WristCoin terminal |
+| TLV Error | 0x0D | Event ID specified is not supported by this WristCoin terminal |
+| Corrupted wristband error | 0x0E | Wristband data is in an illegal state | 
+| Wristband unscratched | 0x0F | Wristband has not been activated (i.e scratched for dual mode) |
+| Amount too large | 0x10 | Debit or credit amount exceeds maximum allowed, must be less than 2147483467 |
+| Insufficient balance | 0x11 | Wristband has insufficient balance for that transaction |
+| Crypto error | 0x12 | Internal Error - Crypto engine error |
+| Wristband authentication error | 0x13 | Wristband authentication error |
+| Debiting wristband error | 0x14 | Error debiting wristband |
+| URL handling error | 0x15 | Internal Error - URL parsing or composing error |
+| Wristband deactivated | 0x16 | Wristband is de-activated and cannot be used for any transactions |
+| Wristband detection timeout | 0x17 | Wristband was not detected before the timeout | 
+| Can't topup online wristband | 0x18 | Wristband is set to online topup - can only be topped up online and closed out with a mPOS terminal |
+| Can't closeout wristband with pending reversal | 0x19 | Wristband cannot be closed out because it has pending reversal requests |
+| Wristband closed | 0x1A | Wristband is (already) closed out |
+| Error topping up wristband | 0x1B | Error topping up wristband |
+| Error closing out wristband | 0x1C | Error closing out wristband |
+| Can't closeout re-conditionable wristband | 0x1D | Only single-use wristbands can be closed out using this terminal |
+| Unrecognized error | 0xFF | Unknown error occurred |
+ 
 ## Tag - Length - Value (TLV) Data Encoding Specification
 
 In v1.1.0 TLV parsing is now supported and is handled by the `KotlinTLV` dependency 

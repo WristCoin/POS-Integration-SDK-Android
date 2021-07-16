@@ -8,7 +8,6 @@ buildscript {
     dependencies {
         classpath "com.android.tools.build:gradle:4.1.3"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -29,13 +28,13 @@ ext.globalCfg = [
         minSdkVersion: 19,
         compileSdkVersion: 23,
         buildToolsVersion: "29.0.2",
-        publishVersion: "1.1.0",
+        publishVersion: "1.2.0",
         publishGroupId: 'com.mywristcoin',
 ]
 
 ext.libraries = [
+        tcmpCommandFamilyCommon: "com.taptrack:tcmp:2.4.0",
         androidSupportAnnotations: "com.android.support:support-annotations:23.1.1",
-        tcmpCommandFamilyCommon: "com.taptrack.tcmptappy2:tcmp:2.0.0",
         kotlinTlv: 'com.taptrack:kotlin-tlv:2.0.0',
         junit: 'junit:junit:4.12',
 ]
